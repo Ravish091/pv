@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="googlebot" content="noindex, nofollow">
+    <title>PV-Komponenten Swipe System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 40px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* Swipe Container */
+        .swipe-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .swipe-wrapper {
+            display: flex;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: grab;
+        }
+
+        .swipe-wrapper:active {
+            cursor: grabbing;
+        }
+
+        .swipe-slide {
+            flex: 0 0 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            min-height: 500px;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: white;
+            border-right: 1px solid #e9ecef;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:last-child {
+            border-right: none;
+        }
+
+        .product-card:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .product-placeholder {
+            font-size: 3rem;
+            color: #00d4aa;
+            opacity: 0.3;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            color: #636e72;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        /* Navigation Arrows */
+        .swipe-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: #8bc34a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(139, 195, 74, 0.3);
+        }
+
+        .swipe-nav:hover {
+            background: #7cb342;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .swipe-nav:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .swipe-prev {
+            left: 20px;
+        }
+
+        .swipe-next {
+            right: 20px;
+        }
+
+        /* Pagination Dots */
+        .swipe-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-dot.active {
+            background: #8bc34a;
+            transform: scale(1.2);
+        }
+
+        .pagination-dot:hover {
+            background: #8bc34a;
+            opacity: 0.7;
+        }
+
+        /* Progress Bar */
+        .swipe-progress {
+            height: 4px;
+            background: #e9ecef;
+            margin-top: 20px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8bc34a 0%, #7cb342 100%);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 33.33%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .swipe-slide {
+                grid-template-columns: 1fr;
+            }
+
+            .product-card {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+                padding: 30px 20px;
+            }
+
+            .product-card:last-child {
+                border-bottom: none;
+            }
+
+            .product-image {
+                height: 150px;
+                margin-bottom: 20px;
+            }
+
+            .swipe-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .swipe-prev {
+                left: 10px;
+            }
+
+            .swipe-next {
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 30px;
+            }
+
+            .product-card {
+                padding: 20px 15px;
+            }
+
+            .product-title {
+                font-size: 1.1rem;
+            }
+
+            .product-description {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Touch Indicators */
+        .touch-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(139, 195, 74, 0.1);
+            color: #8bc34a;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 5;
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e9ecef;
+            border-top: 3px solid #8bc34a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="section-title">PV-Komponenten & Technologie</h1>
+        
+        <div class="swipe-container" id="swipeContainer">
+            <div class="touch-indicator">
+                ← Wischen oder Pfeiltasten →
+            </div>
+            
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner"></div>
+            </div>
+            
+            <div class="swipe-wrapper" id="swipeWrapper">
+                <!-- Slide 1 -->
+                <div class="swipe-slide">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="PV-Module Unterkonstruktion">
+                        </div>
+                        <h3 class="product-title">Unterkonstruktion</h3>
+                        <p class="product-description">Die Unterkonstruktion sorgt für eine stabile und sichere Montage der PV-Module. Je nach Dachtyp - Flachdach, Steildach oder unterschiedliche Neigungen - bieten wir die passende Lösung mit witterungsbeständigen Materialien wie Aluminium oder Stahl.</p>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Ziegelersatzplatten für PV-Montage">
+                        </div>
+                        <h3 class="product-title">Ziegelersatzplatten</h3>
+                        <p class="product-description">Sie ersetzen einzelne Ziegel und ermöglichen eine stabile Befestigung der Module. Dadurch wird das Dach nicht beschädigt, und die Montage erfolgt effizient und sicher.</p>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hochleistungs PV-Module">
+                        </div>
+                        <h3 class="product-title">Module</h3>
+                        <p class="product-description">Unsere leistungsstarken PV-Module namhafter Hersteller wandeln Sonnenlicht effizient in Strom um - und das bei herausragender Produktgarantie. Mit modernsten Doppelglasmodulen (Leistung von 425-450 Wp) bieten wir Ihnen nicht nur hohe Leistung, sondern auch eine ästhetische Lösung für Ihr Dach.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="swipe-slide">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hochleistungs PV-Module">
+                        </div>
+                        <h3 class="product-title">Module</h3>
+                        <p class="product-description">Unsere leistungsstarken PV-Module namhafter Hersteller wandeln Sonnenlicht effizient in Strom um - und das bei herausragender Produktgarantie. Mit modernsten Doppelglasmodulen (Leistung von 425-450 Wp) bieten wir Ihnen nicht nur hohe Leistung, sondern auch eine ästhetische Lösung für Ihr Dach.</p>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="PV Wechselrichter">
+                        </div>
+                        <h3 class="product-title">Wechselrichter</h3>
+                        <p class="product-description">Der Wechselrichter wandelt den vom Dach erzeugten Gleichstrom in nutzbaren Wechselstrom für Ihr Zuhause um. Hybrid-Wechselrichter bieten zusätzlich die Möglichkeit, einen Batteriespeicher anzuschließen. Wir bieten Geräte in verschiedenen Leistungsstufen an - passend zur Größe Ihrer PV-Anlage.</p>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="PV-Module Unterkonstruktion">
+                        </div>
+                        <h3 class="product-title">Unterkonstruktion</h3>
+                        <p class="product-description">Die Unterkonstruktion sorgt für eine stabile und sichere Montage der PV-Module. Je nach Dachtyp - Flachdach, Steildach oder unterschiedliche Neigungen - bieten wir die passende Lösung mit witterungsbeständigen Materialien wie Aluminium oder Stahl.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="swipe-slide">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="PV Wechselrichter">
+                        </div>
+                        <h3 class="product-title">Wechselrichter</h3>
+                        <p class="product-description">Der Wechselrichter wandelt den vom Dach erzeugten Gleichstrom in nutzbaren Wechselstrom für Ihr Zuhause um. Hybrid-Wechselrichter bieten zusätzlich die Möglichkeit, einen Batteriespeicher anzuschließen. Wir bieten Geräte in verschiedenen Leistungsstufen an - passend zur Größe Ihrer PV-Anlage.</p>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="PV-Module Unterkonstruktion">
+                        </div>
+                        <h3 class="product-title">Unterkonstruktion</h3>
+                        <p class="product-description">Die Unterkonstruktion sorgt für eine stabile und sichere Montage der PV-Module. Je nach Dachtyp - Flachdach, Steildach oder unterschiedliche Neigungen - bieten wir die passende Lösung mit witterungsbeständigen Materialien wie Aluminium oder Stahl.</p>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Ziegelersatzplatten für PV-Montage">
+                        </div>
+                        <h3 class="product-title">Ziegelersatzplatten</h3>
+                        <p class="product-description">Sie ersetzen einzelne Ziegel und ermöglichen eine stabile Befestigung der Module. Dadurch wird das Dach nicht beschädigt, und die Montage erfolgt effizient und sicher.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Arrows -->
+            <button class="swipe-nav swipe-prev" id="prevBtn">‹</button>
+            <button class="swipe-nav swipe-next" id="nextBtn">›</button>
+        </div>
+        
+        <!-- Pagination Dots -->
+        <div class="swipe-pagination" id="pagination"></div>
+        
+        <!-- Progress Bar -->
+        <div class="swipe-progress">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <script>
+        class SwipeSystem {
+            constructor() {
+                this.container = document.getElementById('swipeContainer');
+                this.wrapper = document.getElementById('swipeWrapper');
+                this.slides = document.querySelectorAll('.swipe-slide');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.pagination = document.getElementById('pagination');
+                this.progressFill = document.getElementById('progressFill');
+                this.loadingOverlay = document.getElementById('loadingOverlay');
+                
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.isAnimating = false;
+                this.isDragging = false;
+                this.startX = 0;
+                this.currentX = 0;
+                this.threshold = 50; // Minimum swipe distance
+                
+                this.init();
+            }
+            
+            init() {
+                this.createPagination();
+                this.bindEvents();
+                this.updateUI();
+                this.setupAutoPlay();
+            }
+            
+            createPagination() {
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'pagination-dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    this.pagination.appendChild(dot);
+                }
+            }
+            
+            bindEvents() {
+                // Navigation buttons
+                this.prevBtn.addEventListener('click', () => this.prevSlide());
+                this.nextBtn.addEventListener('click', () => this.nextSlide());
+                
+                // Touch events
+                this.wrapper.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+                this.wrapper.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: true });
+                this.wrapper.addEventListener('touchend', this.handleTouchEnd.bind(this));
+                
+                // Mouse events for desktop
+                this.wrapper.addEventListener('mousedown', this.handleMouseDown.bind(this));
+                this.wrapper.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                this.wrapper.addEventListener('mouseup', this.handleMouseUp.bind(this));
+                this.wrapper.addEventListener('mouseleave', this.handleMouseUp.bind(this));
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', this.handleKeyDown.bind(this));
+                
+                // Window resize
+                window.addEventListener('resize', this.handleResize.bind(this));
+                
+                // Prevent context menu on long press
+                this.wrapper.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+            
+            handleTouchStart(e) {
+                this.startX = e.touches[0].clientX;
+                this.isDragging = true;
+                this.wrapper.style.transition = 'none';
+            }
+            
+            handleTouchMove(e) {
+                if (!this.isDragging) return;
+                this.currentX = e.touches[0].clientX;
+                const deltaX = this.currentX - this.startX;
+                const translateX = -this.currentSlide * 100 + (deltaX / this.container.offsetWidth) * 100;
+                this.wrapper.style.transform = `translateX(${translateX}%)`;
+            }
+            
+            handleTouchEnd() {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+                this.wrapper.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                
+                const deltaX = this.currentX - this.startX;
+                
+                if (Math.abs(deltaX) > this.threshold) {
+                    if (deltaX > 0) {
+                        this.prevSlide();
+                    } else {
+                        this.nextSlide();
+                    }
+                } else {
+                    this.updateTransform();
+                }
+            }
+            
+            handleMouseDown(e) {
+                e.preventDefault();
+                this.startX = e.clientX;
+                this.isDragging = true;
+                this.wrapper.style.transition = 'none';
+                this.wrapper.style.cursor = 'grabbing';
+            }
+            
+            handleMouseMove(e) {
+                if (!this.isDragging) return;
+                this.currentX = e.clientX;
+                const deltaX = this.currentX - this.startX;
+                const translateX = -this.currentSlide * 100 + (deltaX / this.container.offsetWidth) * 100;
+                this.wrapper.style.transform = `translateX(${translateX}%)`;
+            }
+            
+            handleMouseUp() {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+                this.wrapper.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                this.wrapper.style.cursor = 'grab';
+                
+                const deltaX = this.currentX - this.startX;
+                
+                if (Math.abs(deltaX) > this.threshold) {
+                    if (deltaX > 0) {
+                        this.prevSlide();
+                    } else {
+                        this.nextSlide();
+                    }
+                } else {
+                    this.updateTransform();
+                }
+            }
+            
+            handleKeyDown(e) {
+                if (this.isAnimating) return;
+                
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        this.prevSlide();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        this.nextSlide();
+                        break;
+                    case 'Home':
+                        e.preventDefault();
+                        this.goToSlide(0);
+                        break;
+                    case 'End':
+                        e.preventDefault();
+                        this.goToSlide(this.totalSlides - 1);
+                        break;
+                }
+            }
+            
+            handleResize() {
+                clearTimeout(this.resizeTimeout);
+                this.resizeTimeout = setTimeout(() => {
+                    this.updateTransform();
+                }, 250);
+            }
+            
+            prevSlide() {
+                if (this.isAnimating) return;
+                const newSlide = this.currentSlide > 0 ? this.currentSlide - 1 : this.totalSlides - 1;
+                this.goToSlide(newSlide);
+            }
+            
+            nextSlide() {
+                if (this.isAnimating) return;
+                const newSlide = this.currentSlide < this.totalSlides - 1 ? this.currentSlide + 1 : 0;
+                this.goToSlide(newSlide);
+            }
+            
+            goToSlide(slideIndex) {
+                if (this.isAnimating || slideIndex === this.currentSlide) return;
+                
+                this.isAnimating = true;
+                this.showLoading();
+                
+                setTimeout(() => {
+                    this.currentSlide = slideIndex;
+                    this.updateTransform();
+                    this.updateUI();
+                    this.hideLoading();
+                    
+                    setTimeout(() => {
+                        this.isAnimating = false;
+                    }, 300);
+                }, 100);
+            }
+            
+            updateTransform() {
+                const translateX = -this.currentSlide * 100;
+                this.wrapper.style.transform = `translateX(${translateX}%)`;
+            }
+            
+            updateUI() {
+                // Update pagination dots
+                document.querySelectorAll('.pagination-dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+                
+                // Update navigation buttons
+                this.prevBtn.disabled = false;
+                this.nextBtn.disabled = false;
+                
+                // Update progress bar
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                this.progressFill.style.width = `${progress}%`;
+            }
+            
+            showLoading() {
+                this.loadingOverlay.classList.add('active');
+            }
+            
+            hideLoading() {
+                this.loadingOverlay.classList.remove('active');
+            }
+            
+            setupAutoPlay() {
+                // Auto-play is disabled - only manual navigation
+                console.log('Auto-play disabled - manual navigation only');
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new SwipeSystem();
+            
+            // Add smooth scrolling for better UX
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            console.log('Swipe System initialized successfully');
+        });
+    </script>
+</body>
+</html>
